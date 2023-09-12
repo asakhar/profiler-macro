@@ -6,8 +6,8 @@ extern crate proc_macro;
 
 #[proc_macro_attribute]
 pub fn profile(
-  input: proc_macro::TokenStream,
   attr: proc_macro::TokenStream,
+  input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
   match profile_inner(input, attr.into()) {
     Ok(res) => res.into(),
