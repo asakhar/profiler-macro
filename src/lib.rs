@@ -43,7 +43,7 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
     let ret = #inner_ident(#args);
     let end = std::time::Instant::now();
     let end_time = std::time::SystemTime::now();
-    profiler::GLOBAL_PROFILER::entry(#inner_name, end.duration_since(start), start_time, end_time, module_path!());
+    profiler::GLOBAL_PROFILER.entry(#inner_name, end.duration_since(start), start_time, end_time, module_path!());
     return ret;
   );
   eprintln!("output: {}", outer_func.clone().into_token_stream());
