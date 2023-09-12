@@ -25,7 +25,7 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
   func.sig.ident = inner_ident.clone();
   let args: Punctuated<Ident, Token![,]> = {
     let mut args = vec![];
-    for arg in func.sig.inputs {
+    for arg in func.sig.inputs.iter() {
       args.push(match arg {
         syn::FnArg::Receiver(_) => todo!(),
         syn::FnArg::Typed(typed) => match &*typed.pat {
