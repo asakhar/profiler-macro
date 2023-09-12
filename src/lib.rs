@@ -1,6 +1,6 @@
-use proc_macro2::TokenStream;
+use proc_macro2::{TokenStream, Ident};
 use quote::ToTokens;
-use syn::parse_quote;
+use syn::{parse_quote, punctuated::Punctuated, Token};
 
 extern crate proc_macro;
 
@@ -23,15 +23,28 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
   let inner_name = format!("inner_{}", func.sig.ident);
   let inner_ident = syn::Ident::new(&inner_name, func.sig.ident.span());
   func.sig.ident = inner_ident.clone();
+  let args: Punctuated<Ident, Token![,]> = {
+    let mut args = vec![];
+    for arg in func.sig.inputs {
+      args.push(match arg {
+        syn::FnArg::Receiver(_) => todo!(),
+        syn::FnArg::Typed(typed) => match &*typed.pat {
+          syn::Pat::Ident(ident) => ident.ident.clone(),
+          _ => todo!(),
+        },
+      });
+    }
+    args.into_iter().collect()
+  };
   outer_func.block.stmts = parse_quote!(
-    func
+    func;
     let start_time = std::time::SystemTime::now();
     let start = std::time::Intent::now();
-    let ret = #inner_ident();
+    let ret = #inner_ident(#args);
     let end = std::time::Intent::now();
     let end_time = std::time::SystemTime::now();
     profiler::GLOBAL_PROFILER::entry(#inner_name, end.duration_since(start), start_time, end_time, module_path!());
-    ret
+    return ret;
   );
   eprintln!("output: {}", outer_func.clone().into_token_stream());
   Ok(outer_func.into_token_stream())
