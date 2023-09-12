@@ -9,6 +9,8 @@ pub fn profile(
   attr: proc_macro::TokenStream,
   input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
+  eprintln!("attr: {attr}");
+  eprintln!("input: {input}");
   match profile_inner(input, attr.into()) {
     Ok(res) => res.into(),
     Err(err) => err.into_compile_error().into(),
@@ -31,5 +33,6 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
     profiler::GLOBAL_PROFILER::entry(#inner_name, end.duration_since(start), start_time, end_time, module_path!());
     ret
   );
+  eprintln!("output: {}", outer_func.clone().into_token_stream());
   Ok(outer_func.into_token_stream())
 }
