@@ -37,7 +37,7 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
     args.into_iter().collect()
   };
   outer_func.block.stmts = parse_quote!(
-    func;
+    #func;
     let start_time = std::time::SystemTime::now();
     let start = std::time::Instant::now();
     let ret = #inner_ident(#args);
