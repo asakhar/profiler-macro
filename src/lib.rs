@@ -39,9 +39,9 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
   outer_func.block.stmts = parse_quote!(
     func;
     let start_time = std::time::SystemTime::now();
-    let start = std::time::Intent::now();
+    let start = std::time::Instant::now();
     let ret = #inner_ident(#args);
-    let end = std::time::Intent::now();
+    let end = std::time::Instant::now();
     let end_time = std::time::SystemTime::now();
     profiler::GLOBAL_PROFILER::entry(#inner_name, end.duration_since(start), start_time, end_time, module_path!());
     return ret;
