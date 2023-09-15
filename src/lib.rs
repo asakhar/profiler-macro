@@ -84,7 +84,7 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
   //   })
   // }
   func.block.stmts = parse_quote!(
-    let #inner_ident = #inner_closure;
+    let mut #inner_ident = #inner_closure;
     let start_time = std::time::SystemTime::now();
     let start = std::time::Instant::now();
     let ret = #inner_ident();
