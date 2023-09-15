@@ -178,23 +178,66 @@ fn replace_self(expr: &mut syn::Expr, this_ident: Ident) {
     syn::Expr::Lit(_) => return,
     syn::Expr::Loop(loop_expr) => replace_self_in_block(&mut loop_expr.body, this_ident.clone()),
     syn::Expr::Macro(_) => todo!("macro"),
-    syn::Expr::Match(_) => todo!("Match"),
-    syn::Expr::MethodCall(_) => todo!("MethodCall"),
-    syn::Expr::Paren(_) => todo!("Paren"),
-    syn::Expr::Path(_) => todo!("Path"),
-    syn::Expr::Range(_) => todo!("Range"),
+    syn::Expr::Match(match_expr) => {
+      replace_self(&mut match_expr.expr, this_ident.clone());
+      for arm in match_expr.arms.iter_mut() {
+        replace_self(&mut arm.body, this_ident.clone());
+        if let Some((_, guard)) = &mut arm.guard {
+          replace_self(guard, this_ident.clone());
+        }
+      }
+    },
+    syn::Expr::MethodCall(method) => {
+      replace_self(&mut method.receiver, this_ident.clone());
+      for arg in method.args.iter_mut() {
+        replace_self(arg, this_ident.clone());
+      }
+    },
+    syn::Expr::Paren(paren) => replace_self(&mut paren.expr, this_ident),
+    syn::Expr::Path(_) => return,
+    syn::Expr::Range(range) => {
+      if let Some(start) = &mut range.start {
+        replace_self(start, this_ident.clone());
+      }
+      if let Some(end) = &mut range.end {
+        replace_self(end, this_ident.clone());
+      }
+    },
     syn::Expr::Reference(reference) => replace_self(&mut reference.expr, this_ident),
-    syn::Expr::Repeat(_) => todo!("Repeat"),
-    syn::Expr::Return(_) => todo!("Return"),
-    syn::Expr::Struct(_) => todo!("Struct"),
-    syn::Expr::Try(_) => todo!("Try"),
-    syn::Expr::TryBlock(_) => todo!("TryBlock"),
-    syn::Expr::Tuple(_) => todo!("Tuple"),
-    syn::Expr::Unary(_) => todo!("Unary"),
-    syn::Expr::Unsafe(_) => todo!("Unsafe"),
+    syn::Expr::Repeat(repeat) => {
+      replace_self(&mut repeat.expr, this_ident.clone());
+      replace_self(&mut repeat.len, this_ident);
+    },
+    syn::Expr::Return(return_expr) => {
+      if let Some(return_val) = &mut return_expr.expr {
+        replace_self(return_val, this_ident);
+      }
+    },
+    syn::Expr::Struct(struct_expr) => {
+      for field in struct_expr.fields.iter_mut() {
+        replace_self(&mut field.expr, this_ident.clone());
+      }
+      if let Some(rest) = &mut struct_expr.rest {
+        replace_self(rest, this_ident);
+      }
+    },
+    syn::Expr::Try(try_expr) => replace_self(&mut try_expr.expr, this_ident),
+    syn::Expr::TryBlock(try_block) => replace_self_in_block(&mut try_block.block, this_ident),
+    syn::Expr::Tuple(tuple) => {
+      for val in tuple.elems.iter_mut() {
+        replace_self(val, this_ident.clone());
+      }
+    },
+    syn::Expr::Unary(unary) => replace_self(&mut unary.expr, this_ident),
+    syn::Expr::Unsafe(unsafe_expr) => replace_self_in_block(&mut unsafe_expr.block, this_ident),
     syn::Expr::Verbatim(_) => todo!("Verbatim"),
-    syn::Expr::While(_) => todo!("While"),
-    syn::Expr::Yield(_) => todo!("Yield"),
+    syn::Expr::While(while_expr) => {
+      replace_self(&mut while_expr.cond, this_ident.clone());
+      replace_self_in_block(&mut while_expr.body, this_ident);
+    },
+    syn::Expr::Yield(yield_expr) => if let Some(yield_val) = &mut yield_expr.expr {
+      replace_self(yield_val, this_ident);
+    },
     _ => todo!(),
   }
 }
