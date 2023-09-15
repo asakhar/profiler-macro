@@ -26,64 +26,6 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
       return #inner_block;
     }
   };
-  // let mut outer_receiver = None;
-  // let args: Punctuated<Ident, Token![,]> = {
-  //   let mut args = vec![];
-  //   for arg in func.sig.inputs.iter() {
-  //     args.push(match arg {
-  //       syn::FnArg::Receiver(receiver) => {
-  //         let self_ty_ident = Ident::new("Self", receiver.span());
-  //         let this_ident = Ident::new("this", receiver.span());
-  //         outer_receiver = Some((receiver.clone(), this_ident.clone(), self_ty_ident));
-  //         this_ident
-  //       }
-  //       syn::FnArg::Typed(typed) => match &*typed.pat {
-  //         syn::Pat::Ident(ident) => ident.ident.clone(),
-  //         _ => todo!(),
-  //       },
-  //     });
-  //   }
-  //   args.into_iter().collect()
-  // };
-  // if let Some((rx, this_ident, self_ty_ident)) = outer_receiver {
-  //   let ty = Box::new({
-  //     let mut segments = Punctuated::new();
-  //     segments.push(syn::PathSegment {
-  //       ident: self_ty_ident,
-  //       arguments: syn::PathArguments::None,
-  //     });
-  //     let ty = syn::Type::Path(syn::TypePath {
-  //       qself: None,
-  //       path: syn::Path {
-  //         leading_colon: None,
-  //         segments,
-  //       },
-  //     });
-  //     if let Some((and_token, lifetime)) = rx.reference {
-  //       syn::Type::Reference(syn::TypeReference {
-  //         and_token,
-  //         lifetime,
-  //         mutability: rx.mutability,
-  //         elem: Box::new(ty),
-  //       })
-  //     } else {
-  //       ty
-  //     }
-  //   });
-  //   replace_self_in_block(&mut func.block, this_ident.clone());
-  //   *func.sig.inputs.first_mut().unwrap() = syn::FnArg::Typed(syn::PatType {
-  //     attrs: vec![],
-  //     pat: Box::new(syn::Pat::Ident(syn::PatIdent {
-  //       attrs: rx.attrs,
-  //       by_ref: None,
-  //       mutability: None,
-  //       ident: this_ident,
-  //       subpat: None,
-  //     })),
-  //     colon_token: rx.colon_token.unwrap_or(Token![:](Span::call_site())),
-  //     ty,
-  //   })
-  // }
   func.block.stmts = parse_quote!(
     let mut #inner_ident = #inner_closure;
     let start_time = std::time::SystemTime::now();
