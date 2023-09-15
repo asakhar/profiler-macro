@@ -21,10 +21,10 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
   let inner_ident = syn::Ident::new(&inner_name, func.sig.ident.span());
   // let mut outer_func = func.clone();
   let inner_block = func.block.clone();
-  let inner_closure: syn::ExprClosure = parse_quote!{
-    let #inner_name = move || {
+  let inner_closure: syn::ExprClosure = parse_quote! {
+    move || {
       return #inner_block;
-    };
+    }
   };
   // func.sig.ident = inner_ident.clone();
   // let mut outer_receiver = None;
@@ -86,7 +86,7 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
   //   })
   // }
   func.block.stmts = parse_quote!(
-    #inner_closure;
+    let #inner_ident = #inner_closure;
     let start_time = std::time::SystemTime::now();
     let start = std::time::Instant::now();
     let ret = #inner_ident();
@@ -98,8 +98,6 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
   eprintln!("output: {}", func.clone().into_token_stream());
   Ok(func.into_token_stream())
 }
-
-
 
 // use proc_macro2::{Ident, Span, TokenStream};
 // use quote::ToTokens;
