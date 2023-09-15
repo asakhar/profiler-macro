@@ -183,7 +183,7 @@ fn replace_self(expr: &mut syn::Expr, this_ident: Ident) {
     syn::Expr::Paren(_) => todo!("Paren"),
     syn::Expr::Path(_) => todo!("Path"),
     syn::Expr::Range(_) => todo!("Range"),
-    syn::Expr::Reference(_) => todo!("Reference"),
+    syn::Expr::Reference(reference) => replace_self(&mut reference.expr, this_ident),
     syn::Expr::Repeat(_) => todo!("Repeat"),
     syn::Expr::Return(_) => todo!("Return"),
     syn::Expr::Struct(_) => todo!("Struct"),
