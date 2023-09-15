@@ -20,8 +20,9 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
   let inner_name = format!("inner_{}", func.sig.ident);
   let inner_ident = syn::Ident::new(&inner_name, func.sig.ident.span());
   let inner_block = func.block.clone();
+  let return_type = func.sig.output.clone();
   let inner_closure: syn::ExprClosure = parse_quote! {
-    move || {
+    move || #return_type {
       return #inner_block;
     }
   };
