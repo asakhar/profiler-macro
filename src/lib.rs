@@ -194,7 +194,12 @@ fn replace_self(expr: &mut syn::Expr, this_ident: Ident) {
       }
     },
     syn::Expr::Paren(paren) => replace_self(&mut paren.expr, this_ident),
-    syn::Expr::Path(_) => return,
+    syn::Expr::Path(path) => {
+      if path.path.is_ident("self") {
+        path.path.segments.clear();
+        path.path.segments.push(syn::PathSegment{ident: this_ident, arguments: syn::PathArguments::None});
+      }
+    },
     syn::Expr::Range(range) => {
       if let Some(start) = &mut range.start {
         replace_self(start, this_ident.clone());
