@@ -1,6 +1,6 @@
-use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{parse_quote, punctuated::Punctuated, spanned::Spanned, Token};
+use syn::parse_quote;
 
 extern crate proc_macro;
 
@@ -19,14 +19,12 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
   let mut func: syn::ItemFn = syn::parse(input)?;
   let inner_name = format!("inner_{}", func.sig.ident);
   let inner_ident = syn::Ident::new(&inner_name, func.sig.ident.span());
-  // let mut outer_func = func.clone();
   let inner_block = func.block.clone();
   let inner_closure: syn::ExprClosure = parse_quote! {
     move || {
       return #inner_block;
     }
   };
-  // func.sig.ident = inner_ident.clone();
   // let mut outer_receiver = None;
   // let args: Punctuated<Ident, Token![,]> = {
   //   let mut args = vec![];
