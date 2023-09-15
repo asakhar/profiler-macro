@@ -93,7 +93,7 @@ fn profile_inner(input: proc_macro::TokenStream, _attr: TokenStream) -> syn::Res
     profiler::GLOBAL_PROFILER.entry(#inner_name, end.duration_since(start), start_time, end_time, module_path!());
     return ret;
   );
-  eprintln!("output: {}", func.clone().into_token_stream());
+  // eprintln!("output: {}", func.clone().into_token_stream());
   Ok(func.into_token_stream())
 }
 
